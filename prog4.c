@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define BUFFER 34
+
 int getUserInput(char* word1, char* word2);
 void printWordSquare(char* wordA, char* wordB);
 
@@ -20,12 +22,19 @@ void printWordSquare(char* wordA, char* wordB){
         length += (int)len1;
 
     }
+    // allocate memory for each row of the normal matrix
+    char** normal = calloc(length, sizeof(char*));
     for(int i = 0; i < length; i++ ){
-        if( i == 0) {
-            printf(" %s\n", wordA);
-        }else{
-            printf(" %.*s%s\n",i, wordB, wordA+i);
+        // allocate memory to hold an entire string, up to space + 32 + '\0' == 34
+        normal[i] = calloc(BUFFER, sizeof(char));
+        snprintf(normal[i],BUFFER, " %.*s%s",i, wordB, wordA+i);
+    }
+
+    for (int i = 0; i < length; i++) {
+        for (int j = 0; j < strlen(wordA)+1; j++) {
+            printf("%c", normal[i][j]);
         }
+        putchar('\n');
     }
 }
 

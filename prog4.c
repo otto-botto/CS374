@@ -6,33 +6,33 @@
 #define BUFFER 34
 
 int getUserInput(char* word1, char* word2);
-void printWordSquare(char* wordA, char* wordB);
+void printWordSquare(char** matrix, int length, char* wordA, char* wordB);
+void printWordInverted(char** matrix, int length, char* wordA);
 
 int getUserInput(char* word1, char* word2){
     return 0;
 }
 
-void printWordSquare(char* wordA, char* wordB){
-    unsigned long len1 = strlen(wordA);
-    unsigned long len2 = strlen(wordB);
-    int length = 1;
-    if(len1 > len2){
-        length += (int)len2;
-    }else{
-        length += (int)len1;
-
-    }
-    // allocate memory for each row of the normal matrix
-    char** normal = calloc(length, sizeof(char*));
+void printWordSquare(char** matrix,int length, char* wordA, char* wordB){
     for(int i = 0; i < length; i++ ){
-        // allocate memory to hold an entire string, up to space + 32 + '\0' == 34
-        normal[i] = calloc(BUFFER, sizeof(char));
-        snprintf(normal[i],BUFFER, " %.*s%s",i, wordB, wordA+i);
+        snprintf(matrix[i],BUFFER, " %.*s%s",i, wordB, wordA+i);
     }
 
+    int limit = strlen(wordA) + 1;
     for (int i = 0; i < length; i++) {
-        for (int j = 0; j < strlen(wordA)+1; j++) {
-            printf("%c", normal[i][j]);
+        for (int j = 0; j < limit; j++) {
+            printf("%c", matrix[i][j]);
+        }
+        putchar('\n');
+    }
+}
+
+void printWordInverted(char** matrix, int length, char* wordA) {
+    int limit = strlen(wordA) + 1;
+    for (int j = 1; j < limit; j++){
+        putchar(' ');
+         for (int i = 0; i < length; i++) {
+            printf("%c", matrix[i][j]);
         }
         putchar('\n');
     }
@@ -102,14 +102,34 @@ int main(){
         snprintf(wordAClean, numCharsEntered1, "%s", wordA);
         snprintf(wordBClean, numCharsEntered2, "%s", wordB);
 
-        printf("NORMAL\n");
+        // find the length and choose the longer one
+        unsigned long len1 = strlen(wordAClean);
+        unsigned long len2 = strlen(wordBClean);
+        int length = 1;
+        if(len1 > len2){
+            length += (int)len2;
+        }else{
+            length += (int)len1;
+        }
 
-        printWordSquare(wordAClean, wordBClean);
+        // Allocate memory for a 2D array to pass to square and inert
+        char** matrix = calloc(length, sizeof(char*));
+        for(int i = 0; i < length; i++ ){
+            // allocate memory to hold an entire string, up to space + 32 + '\0' == 34
+            matrix[i] = calloc(BUFFER, sizeof(char));
+        }
+        printf("NORMAL\n");
+        printWordSquare(matrix, length, wordAClean, wordBClean);
 
         printf("INVERTED\n");
+        printWordInverted(matrix, length, wordAClean);
 
         free(wordAClean);
         free(wordBClean);
+        for (int i = 0; i < length; i++) {
+            free(matrix[i]);
+        }
+        free(matrix);
     }
 }
 

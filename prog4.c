@@ -49,7 +49,7 @@ int main(){
 
     char* wordA;
     char* wordB;
-    ssize_t bufferSize = 33;
+    size_t bufferSize = 33;
     int numCharsEntered1 = -5;
     int numCharsEntered2 = -5;
 

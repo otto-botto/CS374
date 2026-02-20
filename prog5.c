@@ -25,6 +25,28 @@ void pop(int* top) {
     }
 }
 
+void print_stack(Level* arrayStack, int top) {
+    if (top < 0) {
+        printf("Empty Stack\n");
+    }
+    for (int i = 0; i <= top; i++) {
+        switch (arrayStack[i].type) {
+            case 0: {
+                printf("%d: %ld\n", top+1 - i, arrayStack[i].longValue);
+                break;
+            }
+            case 1: {
+                printf("%d: %f\n", top+1 - i, arrayStack[i].doubleValue);
+                break;
+            }
+            case 2: {
+                printf("%d: %s\n", top+1 - i, arrayStack[i].stringValue);
+                break;
+            }
+        }
+    }
+}
+
 
 int check_input(char* input, int length){
     // check if valid long integer, all numbers and no '.'
@@ -62,6 +84,8 @@ int main() {
 
     while (1) {
         // prompt
+
+        print_stack(myArrayStack, top);
         printf("# ");
         numCharsEntered = getline(&input, &bufferSize, stdin);
         if(numCharsEntered == -1){
@@ -96,11 +120,13 @@ int main() {
                     push(myArrayStack, newLevel, &top);
                     break;
                 } // longer, go to the default}
-            default: {
-                    printf("Invalid input.\n");
+                default: {
+                    printf("Bad Input.\n");
                     break;
                 }
+            }
         }
+
     }
     free(input);
     return 0;

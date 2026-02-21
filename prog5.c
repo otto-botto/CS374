@@ -27,6 +27,14 @@ void pop(int* top) {
     }
 }
 
+void roll(Level* arrayStack, int top) {
+    for (int i = 0; i < top; i++) {
+        Level tmp = arrayStack[i];
+        arrayStack[i] = arrayStack[i+1];
+        arrayStack[i+1] = tmp;
+    }
+}
+
 void print_stack(Level* arrayStack, int top) {
     if (top < 0) {
         printf("Empty Stack\n");
@@ -107,6 +115,8 @@ int main() {
             pop(&top);
         } else if (strcmp(input, "q") == 0) {
             break;
+        }else if (strcmp(input, "r") == 0) {
+            roll(myArrayStack, top);
         }else {
             // check if entry is valid
             int result = check_input(input, numCharsEntered);

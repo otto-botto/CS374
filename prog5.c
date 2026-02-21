@@ -22,6 +22,8 @@ void push(Level* arrayStack, Level new, int* top) {
 void pop(int* top) {
     if ((*top)!= -1) {
         (*top)--;
+    }else {
+        printf("Insufficient Arguments\n");
     }
 }
 
@@ -98,31 +100,40 @@ int main() {
             input[numCharsEntered - 1] = 0;
             numCharsEntered--;
         }
-        // check if entry is valid
-        int result = check_input(input, numCharsEntered);
-        switch(result){
-            case 0: {
-                // don't need to capture endptr like in check_input, because validated long, pass NULL
-                Level newLevel = {result, strtol(input, NULL,10), 0.0, ""};
-                push(myArrayStack, newLevel, &top);
-                break;
-            }
-            case 1: {
-                // don't need to capture endptr like in check_input, because validated double, pass NULL
-                Level newLevel = {result, 0, strtod(input, NULL), ""};
-                push(myArrayStack, newLevel, &top);
-                break;
-            }
-            case 2:{
-                if(numCharsEntered <= STR_LEN){
-                    Level newLevel = {result, 0, 0.0, ""};
-                    strcpy(newLevel.stringValue, input);
+
+        // check for commands
+
+        if (strcmp(input, "d") == 0) {
+            pop(&top);
+        } else if (strcmp(input, "q") == 0) {
+            break;
+        }else {
+            // check if entry is valid
+            int result = check_input(input, numCharsEntered);
+            switch(result){
+                case 0: {
+                    // don't need to capture endptr like in check_input, because validated long, pass NULL
+                    Level newLevel = {result, strtol(input, NULL,10), 0.0, ""};
                     push(myArrayStack, newLevel, &top);
                     break;
-                } // longer, go to the default}
-                default: {
-                    printf("Bad Input.\n");
+                }
+                case 1: {
+                    // don't need to capture endptr like in check_input, because validated double, pass NULL
+                    Level newLevel = {result, 0, strtod(input, NULL), ""};
+                    push(myArrayStack, newLevel, &top);
                     break;
+                }
+                case 2:{
+                    if(numCharsEntered <= STR_LEN){
+                        Level newLevel = {result, 0, 0.0, ""};
+                        strcpy(newLevel.stringValue, input);
+                        push(myArrayStack, newLevel, &top);
+                        break;
+                    } // longer, go to the default
+                    default: {
+                        printf("Bad Input.\n");
+                        break;
+                    }
                 }
             }
         }

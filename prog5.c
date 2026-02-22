@@ -92,6 +92,36 @@ void add(Level* arrayStack, int* top){
     }
 }
 
+void subtract(Level* arrayStack, int* top){
+    if (*top <= 0) {
+        printf("Insufficient Arguments\n");
+    }else {
+        Level newLevel = {0,0,0.0,""};
+        if (arrayStack[(*top)-1].type == 0 && arrayStack[*top].type == 0){
+            long int newLongValue= arrayStack[(*top)-1].longValue - arrayStack[*top].longValue;
+            newLevel.longValue = newLongValue;
+        }else if (arrayStack[(*top)-1].type == 0 && arrayStack[*top].type == 1) {
+            double newDoubleValue= arrayStack[(*top)-1].longValue - arrayStack[*top].doubleValue;
+            newLevel.doubleValue = newDoubleValue;
+            newLevel.type = 1;
+        }else if (arrayStack[(*top)-1].type == 1 && arrayStack[*top].type == 0){
+            double newDoubleValue= arrayStack[(*top)-1].doubleValue - arrayStack[*top].longValue;
+            newLevel.doubleValue = newDoubleValue;
+            newLevel.type = 1;
+        }else if (arrayStack[(*top)-1].type == 1 && arrayStack[*top].type == 1) {
+            double newDoubleValue= arrayStack[(*top)-1].doubleValue - arrayStack[*top].doubleValue;
+            newLevel.doubleValue = newDoubleValue;
+            newLevel.type = 1;
+        }else if (arrayStack[(*top)-1].type == 2 || arrayStack[*top].type == 2){
+            printf("Bad Arguments\n");
+            return;
+        }
+        pop(top);
+        pop(top);
+        push(arrayStack, newLevel, top);
+    }
+}
+
 void print_stack(Level* arrayStack, int top) {
     if (top < 0) {
         printf("Empty Stack\n");
@@ -175,6 +205,8 @@ int main() {
             roll(myArrayStack, top);
         }else if (strcmp(input, "+") == 0) {
             add(myArrayStack, &top);
+        }else if (strcmp(input, "-") == 0) {
+            subtract(myArrayStack, &top);
         }else {
             // check if entry is valid
             int result = check_input(input, numCharsEntered);

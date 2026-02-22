@@ -35,6 +35,63 @@ void roll(Level* arrayStack, int top) {
     }
 }
 
+void add(Level* arrayStack, int* top){
+    if (*top <= 0) {
+        printf("Insufficient Arguments\n");
+    }else {
+        Level newLevel = {0,0,0.0,""};
+        if (arrayStack[(*top)-1].type == 0 && arrayStack[*top].type == 0){
+            long int newLongValue= arrayStack[(*top)-1].longValue + arrayStack[*top].longValue;
+            newLevel.longValue = newLongValue;
+        }else if (arrayStack[(*top)-1].type == 0 && arrayStack[*top].type == 1) {
+            double newDoubleValue= arrayStack[(*top)-1].longValue + arrayStack[*top].doubleValue;
+            newLevel.doubleValue = newDoubleValue;
+            newLevel.type = 1;
+        }else if (arrayStack[(*top)-1].type == 1 && arrayStack[*top].type == 0){
+            double newDoubleValue= arrayStack[(*top)-1].doubleValue + arrayStack[*top].longValue;
+            newLevel.doubleValue = newDoubleValue;
+            newLevel.type = 1;
+        }else if (arrayStack[(*top)-1].type == 1 && arrayStack[*top].type == 1) {
+            double newDoubleValue= arrayStack[(*top)-1].doubleValue + arrayStack[*top].doubleValue;
+            newLevel.doubleValue = newDoubleValue;
+            newLevel.type = 1;
+        }else if (arrayStack[(*top)-1].type == 2 && arrayStack[*top].type == 2){
+            char newStringValue[64] = {0};
+            sprintf(newStringValue, "%s%s",arrayStack[(*top)-1].stringValue, arrayStack[*top].stringValue) ;
+            strncpy(newLevel.stringValue, newStringValue, STR_LEN - 1);
+            newLevel.stringValue[STR_LEN-1] = '\0'; // index 32 is \0
+            newLevel.type = 2;
+        }else if (arrayStack[(*top)-1].type == 0 && arrayStack[*top].type == 2){
+            char newStringValue[64] = {0};
+            sprintf(newStringValue, "%ld%s",arrayStack[(*top)-1].longValue, arrayStack[*top].stringValue) ;
+            strncpy(newLevel.stringValue, newStringValue, STR_LEN - 1);
+            newLevel.stringValue[STR_LEN-1] = '\0'; // index 32 is \0
+            newLevel.type = 2;
+        }else if (arrayStack[(*top)-1].type == 2 && arrayStack[*top].type == 0){
+            char newStringValue[64] = {0};
+            sprintf(newStringValue, "%s%ld",arrayStack[(*top)-1].stringValue, arrayStack[*top].longValue) ;
+            strncpy(newLevel.stringValue, newStringValue, STR_LEN - 1);
+            newLevel.stringValue[STR_LEN-1] = '\0'; // index 32 is \0
+            newLevel.type = 2;
+        }else if (arrayStack[(*top)-1].type == 1 && arrayStack[*top].type == 2){
+            char newStringValue[64] = {0};
+            sprintf(newStringValue, "%f%s",arrayStack[(*top)-1].doubleValue, arrayStack[*top].stringValue) ;
+            strncpy(newLevel.stringValue, newStringValue, STR_LEN - 1);
+            newLevel.stringValue[STR_LEN-1] = '\0'; // index 32 is \0
+            newLevel.type = 2;
+        }else if (arrayStack[(*top)-1].type == 2 && arrayStack[*top].type == 1){
+            char newStringValue[64] = {0};
+            sprintf(newStringValue, "%s%f",arrayStack[(*top)-1].stringValue, arrayStack[*top].doubleValue) ;
+            strncpy(newLevel.stringValue, newStringValue, STR_LEN - 1);
+            newLevel.stringValue[STR_LEN-1] = '\0'; // index 32 is \0
+            newLevel.type = 2;
+        }
+        pop(top);
+        pop(top);
+        push(arrayStack, newLevel, top);
+    }
+}
+
 void print_stack(Level* arrayStack, int top) {
     if (top < 0) {
         printf("Empty Stack\n");
@@ -56,7 +113,6 @@ void print_stack(Level* arrayStack, int top) {
         }
     }
 }
-
 
 int check_input(char* input, int length){
     // check if valid long integer, all numbers and no '.'
@@ -117,6 +173,8 @@ int main() {
             break;
         }else if (strcmp(input, "r") == 0) {
             roll(myArrayStack, top);
+        }else if (strcmp(input, "+") == 0) {
+            add(myArrayStack, &top);
         }else {
             // check if entry is valid
             int result = check_input(input, numCharsEntered);

@@ -80,7 +80,7 @@ void add(Level* arrayStack, int* top){
             newLevel.stringValue[STR_LEN-1] = '\0'; // index 32 is \0
             newLevel.type = 2;
         }else if (arrayStack[(*top)-1].type == 2 && arrayStack[*top].type == 1){
-            char newStringValue[64] = {0};
+            char newStringValue[128] = {0};
             sprintf(newStringValue, "%s%f",arrayStack[(*top)-1].stringValue, arrayStack[*top].doubleValue) ;
             strncpy(newLevel.stringValue, newStringValue, STR_LEN - 1);
             newLevel.stringValue[STR_LEN-1] = '\0'; // index 32 is \0

@@ -19,11 +19,12 @@ void push(Level* arrayStack, Level new, int* top) {
     }
 }
 
-void pop(int* top) {
+int pop(int* top) {
     if ((*top)!= -1) {
         (*top)--;
+        return 0;
     }else {
-        printf("Insufficient Arguments\n");
+        return 1;
     }
 }
 
@@ -123,9 +124,9 @@ int subtract(Level* arrayStack, int* top){
     }
 }
 
-void multiply(Level* arrayStack, int* top){
+int multiply(Level* arrayStack, int* top){
     if (*top <= 0) {
-        printf("Insufficient Arguments\n");
+        return 1;
     }else {
         Level newLevel = {0,0,0.0,""};
         if (arrayStack[(*top)-1].type == 0 && arrayStack[*top].type == 0){
@@ -144,23 +145,21 @@ void multiply(Level* arrayStack, int* top){
             newLevel.doubleValue = newDoubleValue;
             newLevel.type = 1;
         }else if (arrayStack[(*top)-1].type == 2 || arrayStack[*top].type == 2){
-            printf("Bad Arguments\n");
-            return;
+            return 2;
         }
         pop(top);
         pop(top);
         push(arrayStack, newLevel, top);
+        return 0;
     }
 }
 
-void divide(Level* arrayStack, int* top){
+int divide(Level* arrayStack, int* top){
     if (*top <= 0) {
-        printf("Insufficient Arguments\n");
+        return 1;
     }else if ((arrayStack[*top].type == 0 && arrayStack[*top].longValue == 0) ||
         (arrayStack[*top].type == 1 && arrayStack[*top].doubleValue == 0.0) ) {
-
-        printf("Divide by zero\n");
-        return;
+        return 2;
     }else {
         Level newLevel = {0,0,0.0,""};
         if (arrayStack[(*top)-1].type == 0 && arrayStack[*top].type == 0){
@@ -179,12 +178,12 @@ void divide(Level* arrayStack, int* top){
             newLevel.doubleValue = newDoubleValue;
             newLevel.type = 1;
         }else if (arrayStack[(*top)-1].type == 2 || arrayStack[*top].type == 2){
-            printf("Bad Arguments\n");
-            return;
+            return 3;
         }
         pop(top);
         pop(top);
         push(arrayStack, newLevel, top);
+        return 0;
     }
 }
 
@@ -235,14 +234,14 @@ int check_input(char* input, int length){
 }
 
 void logging(FILE* fileStream, char* input, Level* arrayStack, int top) {
-    if (strlen(input) != 0) {
-        printf("%s\n", input);
-        fprintf(fileStream, "%s\n", input);
-    }
-    if (top < 0) {
-        printf("Empty Stack\n");
-        fprintf(fileStream,"Empty Stack\n");
-    }
+    // if (strlen(input) != 0) {
+    //     printf("%s\n", input);
+    //     fprintf(fileStream, "%s\n", input);
+    // }
+    // if (top < 0) {
+    //     printf("Empty Stack\n");
+    //     fprintf(fileStream,"Empty Stack\n");
+    // }
     for (int i = 0; i <= top; i++) {
         switch (arrayStack[i].type) {
             case 0: {
@@ -283,7 +282,7 @@ int main() {
         // prompt
 
         // print_stack(myArrayStack, top);
-        logging(fileStream, input, myArrayStack, top);
+        if (top < 0) printf("Empty Stack\n");
         printf("# ");
         numCharsEntered = getline(&input, &bufferSize, stdin);
         if(numCharsEntered == -1){
@@ -302,7 +301,11 @@ int main() {
         // check for commands
 
         if (strcmp(input, "d") == 0) {
-            pop(&top);
+            math_result = pop(&top);
+            if (math_result == 1) {
+                fprintf(fileStream, "Insufficient Arguments\n");
+                printf("Insufficient Arguments\n");
+            }
         } else if (strcmp(input, "q") == 0) {
             break;
         }else if (strcmp(input, "r") == 0) {
@@ -323,10 +326,27 @@ int main() {
                 printf("Bad Arguments\n");
             }
         }else if (strcmp(input, "*") == 0) {
-            multiply(myArrayStack, &top);
-        }else if (strcmp(input, "/") == 0) {
-            divide(myArrayStack, &top);
-        }else {
+            math_result = multiply(myArrayStack, &top);
+            if (math_result == 1) {
+                fprintf(fileStream, "Insufficient Arguments\n");
+                printf("Insufficient Arguments\n");
+            }else if (math_result == 2) {
+                fprintf(fileStream, "Bad Arguments\n");
+                printf("Bad Arguments\n");
+            }
+        } else if (strcmp(input, "/") == 0) {
+            math_result = divide(myArrayStack, &top);
+            if (math_result == 1) {
+                fprintf(fileStream, "Insufficient Arguments\n");
+                printf("Insufficient Arguments\n");
+            }else if (math_result == 2) {
+                fprintf(fileStream, "Divide by zero\n");
+                printf("Divide by zero\n");
+            }else if (math_result == 3) {
+                fprintf(fileStream, "Bad Arguments\n");
+                printf("Bad Arguments\n");
+            }
+        } else {
             // check if entry is valid
             int result = check_input(input, numCharsEntered);
             switch(result){
@@ -351,15 +371,18 @@ int main() {
                     } // longer, go to the default
                     default: {
                         printf("Bad Input.\n");
+                        fprintf(fileStream, "Bad Input.\n");
                         break;
                     }
                 }
             }
         }
+        logging(fileStream, input, myArrayStack, top);
 
     }
     free(input);
     fclose(fileStream);
     return 0;
 }
+
 

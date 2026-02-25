@@ -35,9 +35,9 @@ void roll(Level* arrayStack, int top) {
     }
 }
 
-void add(Level* arrayStack, int* top){
+int add(Level* arrayStack, int* top){
     if (*top <= 0) {
-        printf("Insufficient Arguments\n");
+        return 1;
     }else {
         Level newLevel = {0,0,0.0,""};
         if (arrayStack[(*top)-1].type == 0 && arrayStack[*top].type == 0){
@@ -89,12 +89,13 @@ void add(Level* arrayStack, int* top){
         pop(top);
         pop(top);
         push(arrayStack, newLevel, top);
+        return 0;
     }
 }
 
-void subtract(Level* arrayStack, int* top){
+int subtract(Level* arrayStack, int* top){
     if (*top <= 0) {
-        printf("Insufficient Arguments\n");
+        return 1;
     }else {
         Level newLevel = {0,0,0.0,""};
         if (arrayStack[(*top)-1].type == 0 && arrayStack[*top].type == 0){
@@ -113,12 +114,12 @@ void subtract(Level* arrayStack, int* top){
             newLevel.doubleValue = newDoubleValue;
             newLevel.type = 1;
         }else if (arrayStack[(*top)-1].type == 2 || arrayStack[*top].type == 2){
-            printf("Bad Arguments\n");
-            return;
+            return 2;
         }
         pop(top);
         pop(top);
         push(arrayStack, newLevel, top);
+        return 0;
     }
 }
 
@@ -233,6 +234,36 @@ int check_input(char* input, int length){
     return -1;
 }
 
+void logging(FILE* fileStream, char* input, Level* arrayStack, int top) {
+    if (strlen(input) != 0) {
+        printf("%s\n", input);
+        fprintf(fileStream, "%s\n", input);
+    }
+    if (top < 0) {
+        printf("Empty Stack\n");
+        fprintf(fileStream,"Empty Stack\n");
+    }
+    for (int i = 0; i <= top; i++) {
+        switch (arrayStack[i].type) {
+            case 0: {
+                printf("%d: %ld\n", top+1 - i, arrayStack[i].longValue);
+                fprintf(fileStream,"%d: %ld\n", top+1 - i, arrayStack[i].longValue);
+                break;
+            }
+            case 1: {
+                printf("%d: %f\n", top+1 - i, arrayStack[i].doubleValue);
+                fprintf(fileStream,"%d: %f\n", top+1 - i, arrayStack[i].doubleValue);
+                break;
+            }
+            case 2: {
+                printf("%d: %s\n", top+1 - i, arrayStack[i].stringValue);
+                fprintf(fileStream,"%d: %s\n", top+1 - i, arrayStack[i].stringValue);
+                break;
+            }
+        }
+    }
+}
+
 
 int main() {
     char *input;
@@ -243,10 +274,16 @@ int main() {
     int top = -1;
     Level myArrayStack[5];
 
+    // open a file stream to log into
+    FILE* fileStream = NULL;
+    char* filePath = "prog5_log.txt";
+    fileStream = fopen(filePath, "w");
+
     while (1) {
         // prompt
 
-        print_stack(myArrayStack, top);
+        // print_stack(myArrayStack, top);
+        logging(fileStream, input, myArrayStack, top);
         printf("# ");
         numCharsEntered = getline(&input, &bufferSize, stdin);
         if(numCharsEntered == -1){
@@ -260,6 +297,8 @@ int main() {
             numCharsEntered--;
         }
 
+        int math_result;
+
         // check for commands
 
         if (strcmp(input, "d") == 0) {
@@ -269,9 +308,20 @@ int main() {
         }else if (strcmp(input, "r") == 0) {
             roll(myArrayStack, top);
         }else if (strcmp(input, "+") == 0) {
-            add(myArrayStack, &top);
+            math_result = add(myArrayStack, &top);
+            if (math_result == 1) {
+                fprintf(fileStream, "Insufficient Arguments\n");
+                printf("Insufficient Arguments\n");
+            }
         }else if (strcmp(input, "-") == 0) {
-            subtract(myArrayStack, &top);
+            math_result = subtract(myArrayStack, &top);
+            if (math_result == 1) {
+                fprintf(fileStream, "Insufficient Arguments\n");
+                printf("Insufficient Arguments\n");
+            }else if (math_result == 2) {
+                fprintf(fileStream, "Bad Arguments\n");
+                printf("Bad Arguments\n");
+            }
         }else if (strcmp(input, "*") == 0) {
             multiply(myArrayStack, &top);
         }else if (strcmp(input, "/") == 0) {
@@ -309,6 +359,7 @@ int main() {
 
     }
     free(input);
+    fclose(fileStream);
     return 0;
 }
 

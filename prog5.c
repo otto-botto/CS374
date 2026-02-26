@@ -159,7 +159,7 @@ int divide(Level* arrayStack, int* top){
         return 1;
     }else if ((arrayStack[*top].type == 0 && arrayStack[*top].longValue == 0) ||
         (arrayStack[*top].type == 1 && arrayStack[*top].doubleValue == 0.0) ) {
-        return 2;
+        return 3;
     }else {
         Level newLevel = {0,0,0.0,""};
         if (arrayStack[(*top)-1].type == 0 && arrayStack[*top].type == 0){
@@ -178,7 +178,7 @@ int divide(Level* arrayStack, int* top){
             newLevel.doubleValue = newDoubleValue;
             newLevel.type = 1;
         }else if (arrayStack[(*top)-1].type == 2 || arrayStack[*top].type == 2){
-            return 3;
+            return 2;
         }
         pop(top);
         pop(top);
@@ -237,31 +237,33 @@ void logging(FILE* fileStream, char* input, Level* arrayStack, int top, int math
     if (strlen(input) != 0) {
         fprintf(fileStream, "%s\n", input);
     }
-    if (top < 0 && mathResult != 4) {
+    if (mathResult == 4) {
+        printf("Bad Input\n");
+        fprintf(fileStream, "Bad Result\n");
+        return;
+    }
+    if (top < 0) {
         fprintf(fileStream,"Empty Stack\n");
     }
 
     if (mathResult != 0) {
         switch (mathResult) {
 
-            case
+            case 1: {
                 printf("Insufficient Arguments\n");
                 fprintf(fileStream, "Insufficient Arguments\n");
+                break;
             }
             case 2: {
                 printf("Bad Arguments\n");
                 fprintf(fileStream, "Bad Arguments\n");
+                break;
             }
             case 3: {
                 printf("Division by Zero\n");
                 fprintf(fileStream, "Division by Zero\n");
+                break;
             }
-            case 4: {
-                printf("Bad Input\n");
-                fprintf(fileStream, "Bad Input\n");
-            }
-
-
         }
     }
     for (int i = 0; i <= top; i++) {
@@ -327,7 +329,7 @@ int main() {
         // check for commands
         if (strcmp(input, "d") == 0) {
             math_result = pop(&top);
-            logging(fileStream, input, myArrayStack, top, math_result);
+            //logging(fileStream, input, myArrayStack, top, math_result);
         } else if (strcmp(input, "q") == 0) {
             fprintf(fileStream, "q\n");
             break;
@@ -335,16 +337,16 @@ int main() {
             roll(myArrayStack, top); //TODO: finish this command
         }else if (strcmp(input, "+") == 0) {
             math_result = add(myArrayStack, &top);
-            logging(fileStream, input, myArrayStack, top, math_result);
+            //logging(fileStream, input, myArrayStack, top, math_result);
         }else if (strcmp(input, "-") == 0) {
             math_result = subtract(myArrayStack, &top);
-            logging(fileStream, input, myArrayStack, top, math_result);
+            //logging(fileStream, input, myArrayStack, top, math_result);
         }else if (strcmp(input, "*") == 0) {
             math_result = multiply(myArrayStack, &top);
-            logging(fileStream, input, myArrayStack, top, math_result);
+            //logging(fileStream, input, myArrayStack, top, math_result);
         } else if (strcmp(input, "/") == 0) {
             math_result = divide(myArrayStack, &top);
-            logging(fileStream, input, myArrayStack, top, math_result);
+            //logging(fileStream, input, myArrayStack, top, math_result);
         } else {
             // check if the entry is valid
             int result = check_input(input, numCharsEntered);

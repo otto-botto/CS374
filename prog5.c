@@ -233,15 +233,36 @@ int check_input(char* input, int length){
     return -1;
 }
 
-void logging(FILE* fileStream, char* input, Level* arrayStack, int top) {
-    // if (strlen(input) != 0) {
-    //     printf("%s\n", input);
-    //     fprintf(fileStream, "%s\n", input);
-    // }
-    // if (top < 0) {
-    //     printf("Empty Stack\n");
-    //     fprintf(fileStream,"Empty Stack\n");
-    // }
+void logging(FILE* fileStream, char* input, Level* arrayStack, int top, int mathResult) {
+    if (strlen(input) != 0) {
+        fprintf(fileStream, "%s\n", input);
+    }
+    if (top < 0 && mathResult != 4) {
+        fprintf(fileStream,"Empty Stack\n");
+    }
+
+    if (mathResult != 0) {
+        switch (mathResult) {
+            case 1: {
+                printf("Insufficient Arguments\n");
+                fprintf(fileStream, "Insufficient Arguments\n");
+            }
+            case 2: {
+                printf("Bad Arguments\n");
+                fprintf(fileStream, "Bad Arguments\n");
+            }
+            case 3: {
+                printf("Division by Zero\n");
+                fprintf(fileStream, "Division by Zero\n");
+            }
+            case 4: {
+                printf("Bad Input\n");
+                fprintf(fileStream, "Bad Input\n");
+            }
+
+
+        }
+    }
     for (int i = 0; i <= top; i++) {
         switch (arrayStack[i].type) {
             case 0: {
@@ -261,6 +282,7 @@ void logging(FILE* fileStream, char* input, Level* arrayStack, int top) {
             }
         }
     }
+
 }
 
 
@@ -278,10 +300,13 @@ int main() {
     char* filePath = "prog5_log.txt";
     fileStream = fopen(filePath, "w");
 
+    int math_result = -1;
+
     while (1) {
         // prompt
 
         // print_stack(myArrayStack, top);
+        logging(fileStream, input, myArrayStack, top, math_result);
         if (top < 0) printf("Empty Stack\n");
         printf("# ");
         numCharsEntered = getline(&input, &bufferSize, stdin);
@@ -296,70 +321,45 @@ int main() {
             numCharsEntered--;
         }
 
-        int math_result;
+
 
         // check for commands
-
         if (strcmp(input, "d") == 0) {
             math_result = pop(&top);
-            if (math_result == 1) {
-                fprintf(fileStream, "Insufficient Arguments\n");
-                printf("Insufficient Arguments\n");
-            }
+            logging(fileStream, input, myArrayStack, top, math_result);
         } else if (strcmp(input, "q") == 0) {
+            fprintf(fileStream, "q\n");
             break;
         }else if (strcmp(input, "r") == 0) {
-            roll(myArrayStack, top);
+            roll(myArrayStack, top); //TODO: finish this command
         }else if (strcmp(input, "+") == 0) {
             math_result = add(myArrayStack, &top);
-            if (math_result == 1) {
-                fprintf(fileStream, "Insufficient Arguments\n");
-                printf("Insufficient Arguments\n");
-            }
+            logging(fileStream, input, myArrayStack, top, math_result);
         }else if (strcmp(input, "-") == 0) {
             math_result = subtract(myArrayStack, &top);
-            if (math_result == 1) {
-                fprintf(fileStream, "Insufficient Arguments\n");
-                printf("Insufficient Arguments\n");
-            }else if (math_result == 2) {
-                fprintf(fileStream, "Bad Arguments\n");
-                printf("Bad Arguments\n");
-            }
+            logging(fileStream, input, myArrayStack, top, math_result);
         }else if (strcmp(input, "*") == 0) {
             math_result = multiply(myArrayStack, &top);
-            if (math_result == 1) {
-                fprintf(fileStream, "Insufficient Arguments\n");
-                printf("Insufficient Arguments\n");
-            }else if (math_result == 2) {
-                fprintf(fileStream, "Bad Arguments\n");
-                printf("Bad Arguments\n");
-            }
+            logging(fileStream, input, myArrayStack, top, math_result);
         } else if (strcmp(input, "/") == 0) {
             math_result = divide(myArrayStack, &top);
-            if (math_result == 1) {
-                fprintf(fileStream, "Insufficient Arguments\n");
-                printf("Insufficient Arguments\n");
-            }else if (math_result == 2) {
-                fprintf(fileStream, "Divide by zero\n");
-                printf("Divide by zero\n");
-            }else if (math_result == 3) {
-                fprintf(fileStream, "Bad Arguments\n");
-                printf("Bad Arguments\n");
-            }
+            logging(fileStream, input, myArrayStack, top, math_result);
         } else {
-            // check if entry is valid
+            // check if the entry is valid
             int result = check_input(input, numCharsEntered);
             switch(result){
                 case 0: {
                     // don't need to capture endptr like in check_input, because validated long, pass NULL
                     Level newLevel = {result, strtol(input, NULL,10), 0.0, ""};
                     push(myArrayStack, newLevel, &top);
+                    math_result = 0;
                     break;
                 }
                 case 1: {
                     // don't need to capture endptr like in check_input, because validated double, pass NULL
                     Level newLevel = {result, 0, strtod(input, NULL), ""};
                     push(myArrayStack, newLevel, &top);
+                    math_result = 0;
                     break;
                 }
                 case 2:{
@@ -367,18 +367,16 @@ int main() {
                         Level newLevel = {result, 0, 0.0, ""};
                         strcpy(newLevel.stringValue, input);
                         push(myArrayStack, newLevel, &top);
+                        math_result = 0;
                         break;
                     } // longer, go to the default
                     default: {
-                        printf("Bad Input.\n");
-                        fprintf(fileStream, "Bad Input.\n");
+                        math_result = 4;
                         break;
                     }
                 }
             }
         }
-        logging(fileStream, input, myArrayStack, top);
-
     }
     free(input);
     fclose(fileStream);

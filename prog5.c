@@ -243,7 +243,8 @@ void logging(FILE* fileStream, char* input, Level* arrayStack, int top, int math
 
     if (mathResult != 0) {
         switch (mathResult) {
-            case 1: {
+
+            case
                 printf("Insufficient Arguments\n");
                 fprintf(fileStream, "Insufficient Arguments\n");
             }

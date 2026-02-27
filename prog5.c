@@ -28,12 +28,16 @@ int pop(int* top) {
     }
 }
 
-void roll(Level* arrayStack, int top) {
+int roll(Level* arrayStack, int top) {
+    if (top <= 0) {
+        return 1;
+    }
     for (int i = 0; i < top; i++) {
         Level tmp = arrayStack[i];
         arrayStack[i] = arrayStack[i+1];
         arrayStack[i+1] = tmp;
     }
+    return 0;
 }
 
 int add(Level* arrayStack, int* top){
@@ -233,6 +237,20 @@ int check_input(char* input, int length){
     return -1;
 }
 
+void printWordSquare(char** matrix,int length, char* wordA, char* wordB){
+    for(int i = 0; i < length; i++ ){
+        snprintf(matrix[i],STR_LEN, " %.*s%s",i, wordB, wordA+i);
+    }
+
+    int limit = strlen(wordA) + 1;
+    for (int i = 0; i < length; i++) {
+        for (int j = 0; j < limit; j++) {
+            printf("%c", matrix[i][j]);
+        }
+        putchar('\n');
+    }
+}
+
 void logging(FILE* fileStream, char* input, Level* arrayStack, int top, int mathResult) {
     if (strlen(input) != 0) {
         fprintf(fileStream, "%s\n", input);
@@ -248,7 +266,6 @@ void logging(FILE* fileStream, char* input, Level* arrayStack, int top, int math
 
     if (mathResult != 0) {
         switch (mathResult) {
-
             case 1: {
                 printf("Insufficient Arguments\n");
                 fprintf(fileStream, "Insufficient Arguments\n");
@@ -324,8 +341,6 @@ int main() {
             numCharsEntered--;
         }
 
-
-
         // check for commands
         if (strcmp(input, "d") == 0) {
             math_result = pop(&top);
@@ -334,19 +349,19 @@ int main() {
             fprintf(fileStream, "q\n");
             break;
         }else if (strcmp(input, "r") == 0) {
-            roll(myArrayStack, top); //TODO: finish this command
+            math_result = roll(myArrayStack, top);
         }else if (strcmp(input, "+") == 0) {
             math_result = add(myArrayStack, &top);
-            //logging(fileStream, input, myArrayStack, top, math_result);
+
         }else if (strcmp(input, "-") == 0) {
             math_result = subtract(myArrayStack, &top);
-            //logging(fileStream, input, myArrayStack, top, math_result);
+
         }else if (strcmp(input, "*") == 0) {
             math_result = multiply(myArrayStack, &top);
-            //logging(fileStream, input, myArrayStack, top, math_result);
+
         } else if (strcmp(input, "/") == 0) {
             math_result = divide(myArrayStack, &top);
-            //logging(fileStream, input, myArrayStack, top, math_result);
+
         } else {
             // check if the entry is valid
             int result = check_input(input, numCharsEntered);

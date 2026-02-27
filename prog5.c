@@ -362,6 +362,29 @@ int main() {
         } else if (strcmp(input, "/") == 0) {
             math_result = divide(myArrayStack, &top);
 
+        } else if (strcmp(input, "w") == 0) {
+            if (top <= 0) {
+                math_result = 1;
+            }else if (myArrayStack[top].type != 2 || myArrayStack[top-1].type != 2) {
+                math_result = 2;
+            }else {
+                // find the longer of the two words
+                unsigned long len1 = strlen(myArrayStack[top -1 ].stringValue);
+                unsigned long len2 = strlen(myArrayStack[top].stringValue);
+                int length = 1;
+                if(len1 > len2){
+                    length += (int)len2;
+                }else{
+                    length += (int)len1;
+                }
+                // Allocate memory for a 2D array to pass to square and inert
+                char** matrix = calloc(length, sizeof(char*));
+                for(int i = 0; i < length; i++ ){
+                    matrix[i] = calloc(STR_LEN, sizeof(char));
+                }
+                printWordSquare(matrix, length, myArrayStack[top - 1].stringValue, myArrayStack[top].stringValue);
+            }
+
         } else {
             // check if the entry is valid
             int result = check_input(input, numCharsEntered);
